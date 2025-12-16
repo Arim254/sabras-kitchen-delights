@@ -2,6 +2,7 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navLinks = [
   { href: "/#home", label: "Home" },
@@ -54,20 +55,24 @@ export function Header() {
             ))}
           </div>
 
-          <div className="hidden lg:block">
+          <div className="hidden lg:flex items-center gap-2">
+            <ThemeToggle />
             <Button variant="hero" size="lg" asChild>
               <a href="/#contact">Book Now</a>
             </Button>
           </div>
 
           {/* Mobile Menu Button */}
-          <button
+          <div className="flex items-center gap-2 lg:hidden">
+            <ThemeToggle />
+            <button
             className="lg:hidden p-2 text-foreground"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
