@@ -1,12 +1,29 @@
 import { useState } from "react";
-import { Mail, Phone, MapPin, Send, MessageCircle } from "lucide-react";
+import { Mail, Phone, MapPin, Send, MessageCircle, CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 export function ContactSection() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    eventDate: undefined as Date | undefined,
+    eventType: "",
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -16,15 +33,14 @@ export function ContactSection() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     toast({
-      title: "Message Sent!",
-      description: "Thank you for contacting us. We'll get back to you soon.",
+      title: "Inquiry Sent!",
+      description: "Thank you for your inquiry. We'll get back to you soon.",
     });
 
-    setFormData({ name: "", email: "", message: "" });
+    setFormData({ name: "", email: "", eventDate: undefined, eventType: "", message: "" });
     setIsSubmitting(false);
   };
 
@@ -34,6 +50,17 @@ export function ContactSection() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  const eventTypes = [
+    "Wedding",
+    "Corporate Event",
+    "Birthday Party",
+    "Private Dinner",
+    "Anniversary",
+    "Baby Shower",
+    "Graduation Party",
+    "Other",
+  ];
 
   return (
     <section id="contact" className="py-20 lg:py-28 bg-muted/30">
@@ -118,13 +145,16 @@ export function ContactSection() {
 
           {/* Contact Form */}
           <div className="bg-card rounded-lg shadow-theme-lg p-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <h3 className="font-serif text-2xl font-semibold text-foreground mb-6">
+              Book Your Event
+            </h3>
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label
                   htmlFor="name"
                   className="block text-sm font-medium text-foreground mb-2"
                 >
-                  Your Name
+                  Full Name
                 </label>
                 <input
                   type="text"
@@ -157,12 +187,73 @@ export function ContactSection() {
                 />
               </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Event Date
+                  </label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal px-4 py-3 h-auto border-border bg-input",
+                          !formData.eventDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {formData.eventDate ? (
+                          format(formData.eventDate, "dd/MM/yyyy")
+                        ) : (
+                          <span>dd/mm/yyyy</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 bg-popover" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={formData.eventDate}
+                        onSelect={(date) =>
+                          setFormData((prev) => ({ ...prev, eventDate: date }))
+                        }
+                        disabled={(date) => date < new Date()}
+                        initialFocus
+                        className="pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Type of Event
+                  </label>
+                  <Select
+                    value={formData.eventType}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, eventType: value }))
+                    }
+                  >
+                    <SelectTrigger className="w-full px-4 py-3 h-auto border-border bg-input">
+                      <SelectValue placeholder="Select event type" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover">
+                      {eventTypes.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
               <div>
                 <label
                   htmlFor="message"
                   className="block text-sm font-medium text-foreground mb-2"
                 >
-                  Your Message
+                  Event Details & Special Requests
                 </label>
                 <textarea
                   id="message"
@@ -172,7 +263,7 @@ export function ContactSection() {
                   required
                   rows={5}
                   className="w-full px-4 py-3 rounded-lg border border-border bg-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors resize-none"
-                  placeholder="Tell us about your event..."
+                  placeholder="Tell us about your event, number of guests, dietary requirements, or any special requests..."
                 />
               </div>
 
@@ -188,7 +279,7 @@ export function ContactSection() {
                 ) : (
                   <>
                     <Send size={18} />
-                    Send Message
+                    Send Inquiry
                   </>
                 )}
               </Button>
