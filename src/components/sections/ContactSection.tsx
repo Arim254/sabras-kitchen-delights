@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Mail, Phone, MapPin, Send, MessageCircle, CalendarIcon, Users } from "lucide-react";
+import { Mail, Phone, MapPin, Send, MessageCircle, CalendarIcon, Users, Clock, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -22,8 +22,10 @@ interface FormErrors {
   name?: string;
   email?: string;
   eventDate?: string;
+  eventTime?: string;
   eventType?: string;
   guestCount?: string;
+  budgetPerPerson?: string;
   message?: string;
 }
 
@@ -32,13 +34,31 @@ export function ContactSection() {
     name: "",
     email: "",
     eventDate: undefined as Date | undefined,
+    eventTime: "",
     eventType: "",
     guestCount: "",
+    budgetPerPerson: "",
     message: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+
+  const timeSlots = [
+    "08:00 AM",
+    "09:00 AM",
+    "10:00 AM",
+    "11:00 AM",
+    "12:00 PM",
+    "01:00 PM",
+    "02:00 PM",
+    "03:00 PM",
+    "04:00 PM",
+    "05:00 PM",
+    "06:00 PM",
+    "07:00 PM",
+    "08:00 PM",
+  ];
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -68,6 +88,11 @@ export function ContactSection() {
       }
     }
 
+    // Event time validation
+    if (!formData.eventTime) {
+      newErrors.eventTime = "Please select a time slot";
+    }
+
     // Event type validation
     if (!formData.eventType) {
       newErrors.eventType = "Please select an event type";
@@ -82,6 +107,16 @@ export function ContactSection() {
         newErrors.guestCount = "Please enter a valid number of guests";
       } else if (count > 1000) {
         newErrors.guestCount = "Maximum 1000 guests allowed";
+      }
+    }
+
+    // Budget per person validation
+    if (!formData.budgetPerPerson) {
+      newErrors.budgetPerPerson = "Budget per person is required";
+    } else {
+      const budget = parseFloat(formData.budgetPerPerson);
+      if (isNaN(budget) || budget < 1) {
+        newErrors.budgetPerPerson = "Please enter a valid amount";
       }
     }
 
@@ -117,7 +152,16 @@ export function ContactSection() {
       description: "Thank you for your inquiry. We'll get back to you soon.",
     });
 
-    setFormData({ name: "", email: "", eventDate: undefined, eventType: "", guestCount: "", message: "" });
+    setFormData({ 
+      name: "", 
+      email: "", 
+      eventDate: undefined, 
+      eventTime: "",
+      eventType: "", 
+      guestCount: "", 
+      budgetPerPerson: "",
+      message: "" 
+    });
     setErrors({});
     setIsSubmitting(false);
   };
@@ -329,66 +373,131 @@ export function ContactSection() {
 
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    Type of Event <span className="text-destructive">*</span>
+                    Event Time <span className="text-destructive">*</span>
                   </label>
                   <Select
-                    value={formData.eventType}
+                    value={formData.eventTime}
                     onValueChange={(value) => {
-                      setFormData((prev) => ({ ...prev, eventType: value }));
-                      if (errors.eventType) {
-                        setErrors((prev) => ({ ...prev, eventType: undefined }));
+                      setFormData((prev) => ({ ...prev, eventTime: value }));
+                      if (errors.eventTime) {
+                        setErrors((prev) => ({ ...prev, eventTime: undefined }));
                       }
                     }}
                   >
                     <SelectTrigger 
                       className={cn(
                         "w-full px-4 py-3 h-auto bg-input",
-                        errors.eventType ? "border-destructive" : "border-border"
+                        errors.eventTime ? "border-destructive" : "border-border"
                       )}
                     >
-                      <SelectValue placeholder="Select event type" />
+                      <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
+                      <SelectValue placeholder="Select time" />
                     </SelectTrigger>
-                    <SelectContent className="bg-popover">
-                      {eventTypes.map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {type}
+                    <SelectContent className="bg-popover max-h-60">
+                      {timeSlots.map((time) => (
+                        <SelectItem key={time} value={time}>
+                          {time}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  {errors.eventType && (
-                    <p className="mt-1 text-sm text-destructive">{errors.eventType}</p>
+                  {errors.eventTime && (
+                    <p className="mt-1 text-sm text-destructive">{errors.eventTime}</p>
                   )}
                 </div>
               </div>
 
               <div>
-                <label
-                  htmlFor="guestCount"
-                  className="block text-sm font-medium text-foreground mb-2"
-                >
-                  Number of Guests <span className="text-destructive">*</span>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Type of Event <span className="text-destructive">*</span>
                 </label>
-                <div className="relative">
-                  <Users className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <input
-                    type="number"
-                    id="guestCount"
-                    name="guestCount"
-                    value={formData.guestCount}
-                    onChange={handleChange}
-                    min="1"
-                    max="1000"
+                <Select
+                  value={formData.eventType}
+                  onValueChange={(value) => {
+                    setFormData((prev) => ({ ...prev, eventType: value }));
+                    if (errors.eventType) {
+                      setErrors((prev) => ({ ...prev, eventType: undefined }));
+                    }
+                  }}
+                >
+                  <SelectTrigger 
                     className={cn(
-                      "w-full pl-10 pr-4 py-3 rounded-lg border bg-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors",
-                      errors.guestCount ? "border-destructive" : "border-border"
+                      "w-full px-4 py-3 h-auto bg-input",
+                      errors.eventType ? "border-destructive" : "border-border"
                     )}
-                    placeholder="e.g. 50"
-                  />
-                </div>
-                {errors.guestCount && (
-                  <p className="mt-1 text-sm text-destructive">{errors.guestCount}</p>
+                  >
+                    <SelectValue placeholder="Select event type" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover">
+                    {eventTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.eventType && (
+                  <p className="mt-1 text-sm text-destructive">{errors.eventType}</p>
                 )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label
+                    htmlFor="guestCount"
+                    className="block text-sm font-medium text-foreground mb-2"
+                  >
+                    Number of Guests <span className="text-destructive">*</span>
+                  </label>
+                  <div className="relative">
+                    <Users className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <input
+                      type="number"
+                      id="guestCount"
+                      name="guestCount"
+                      value={formData.guestCount}
+                      onChange={handleChange}
+                      min="1"
+                      max="1000"
+                      className={cn(
+                        "w-full pl-10 pr-4 py-3 rounded-lg border bg-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors",
+                        errors.guestCount ? "border-destructive" : "border-border"
+                      )}
+                      placeholder="e.g. 50"
+                    />
+                  </div>
+                  {errors.guestCount && (
+                    <p className="mt-1 text-sm text-destructive">{errors.guestCount}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="budgetPerPerson"
+                    className="block text-sm font-medium text-foreground mb-2"
+                  >
+                    Budget per Person (KES) <span className="text-destructive">*</span>
+                  </label>
+                  <div className="relative">
+                    <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <input
+                      type="number"
+                      id="budgetPerPerson"
+                      name="budgetPerPerson"
+                      value={formData.budgetPerPerson}
+                      onChange={handleChange}
+                      min="1"
+                      className={cn(
+                        "w-full pl-10 pr-4 py-3 rounded-lg border bg-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors",
+                        errors.budgetPerPerson ? "border-destructive" : "border-border"
+                      )}
+                      placeholder="e.g. 1500"
+                    />
+                  </div>
+                  {errors.budgetPerPerson && (
+                    <p className="mt-1 text-sm text-destructive">{errors.budgetPerPerson}</p>
+                  )}
+                </div>
               </div>
 
               <div>
@@ -403,7 +512,7 @@ export function ContactSection() {
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
-                  rows={5}
+                  rows={4}
                   className={cn(
                     "w-full px-4 py-3 rounded-lg border bg-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors resize-none",
                     errors.message ? "border-destructive" : "border-border"
