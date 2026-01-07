@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Mail, Phone, MapPin, Send, MessageCircle, CalendarIcon } from "lucide-react";
+import { Mail, Phone, MapPin, Send, MessageCircle, CalendarIcon, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -18,19 +18,96 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
+interface FormErrors {
+  name?: string;
+  email?: string;
+  eventDate?: string;
+  eventType?: string;
+  guestCount?: string;
+  message?: string;
+}
+
 export function ContactSection() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     eventDate: undefined as Date | undefined,
     eventType: "",
+    guestCount: "",
     message: "",
   });
+  const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    // Name validation
+    if (!formData.name.trim()) {
+      newErrors.name = "Full name is required";
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = "Name must be at least 2 characters";
+    }
+
+    // Email validation
+    if (!formData.email.trim()) {
+      newErrors.email = "Email address is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    // Event date validation
+    if (!formData.eventDate) {
+      newErrors.eventDate = "Event date is required";
+    } else {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (formData.eventDate < today) {
+        newErrors.eventDate = "Event date must be in the future";
+      }
+    }
+
+    // Event type validation
+    if (!formData.eventType) {
+      newErrors.eventType = "Please select an event type";
+    }
+
+    // Guest count validation
+    if (!formData.guestCount) {
+      newErrors.guestCount = "Number of guests is required";
+    } else {
+      const count = parseInt(formData.guestCount, 10);
+      if (isNaN(count) || count < 1) {
+        newErrors.guestCount = "Please enter a valid number of guests";
+      } else if (count > 1000) {
+        newErrors.guestCount = "Maximum 1000 guests allowed";
+      }
+    }
+
+    // Message validation
+    if (!formData.message.trim()) {
+      newErrors.message = "Please provide event details";
+    } else if (formData.message.trim().length < 10) {
+      newErrors.message = "Please provide more details (at least 10 characters)";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      toast({
+        title: "Please fix the errors",
+        description: "Some required fields are missing or invalid.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -40,7 +117,8 @@ export function ContactSection() {
       description: "Thank you for your inquiry. We'll get back to you soon.",
     });
 
-    setFormData({ name: "", email: "", eventDate: undefined, eventType: "", message: "" });
+    setFormData({ name: "", email: "", eventDate: undefined, eventType: "", guestCount: "", message: "" });
+    setErrors({});
     setIsSubmitting(false);
   };
 
@@ -49,6 +127,10 @@ export function ContactSection() {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // Clear error when user starts typing
+    if (errors[name as keyof FormErrors]) {
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
+    }
   };
 
   const eventTypes = [
@@ -154,7 +236,7 @@ export function ContactSection() {
                   htmlFor="name"
                   className="block text-sm font-medium text-foreground mb-2"
                 >
-                  Full Name
+                  Full Name <span className="text-destructive">*</span>
                 </label>
                 <input
                   type="text"
@@ -162,10 +244,15 @@ export function ContactSection() {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
+                  className={cn(
+                    "w-full px-4 py-3 rounded-lg border bg-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors",
+                    errors.name ? "border-destructive" : "border-border"
+                  )}
                   placeholder="John Doe"
                 />
+                {errors.name && (
+                  <p className="mt-1 text-sm text-destructive">{errors.name}</p>
+                )}
               </div>
 
               <div>
@@ -173,7 +260,7 @@ export function ContactSection() {
                   htmlFor="email"
                   className="block text-sm font-medium text-foreground mb-2"
                 >
-                  Email Address
+                  Email Address <span className="text-destructive">*</span>
                 </label>
                 <input
                   type="email"
@@ -181,24 +268,30 @@ export function ContactSection() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
+                  className={cn(
+                    "w-full px-4 py-3 rounded-lg border bg-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors",
+                    errors.email ? "border-destructive" : "border-border"
+                  )}
                   placeholder="john@example.com"
                 />
+                {errors.email && (
+                  <p className="mt-1 text-sm text-destructive">{errors.email}</p>
+                )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    Event Date
+                    Event Date <span className="text-destructive">*</span>
                   </label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-full justify-start text-left font-normal px-4 py-3 h-auto border-border bg-input",
-                          !formData.eventDate && "text-muted-foreground"
+                          "w-full justify-start text-left font-normal px-4 py-3 h-auto bg-input",
+                          !formData.eventDate && "text-muted-foreground",
+                          errors.eventDate ? "border-destructive" : "border-border"
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
@@ -213,28 +306,46 @@ export function ContactSection() {
                       <Calendar
                         mode="single"
                         selected={formData.eventDate}
-                        onSelect={(date) =>
-                          setFormData((prev) => ({ ...prev, eventDate: date }))
-                        }
-                        disabled={(date) => date < new Date()}
+                        onSelect={(date) => {
+                          setFormData((prev) => ({ ...prev, eventDate: date }));
+                          if (errors.eventDate) {
+                            setErrors((prev) => ({ ...prev, eventDate: undefined }));
+                          }
+                        }}
+                        disabled={(date) => {
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          return date < today;
+                        }}
                         initialFocus
                         className="pointer-events-auto"
                       />
                     </PopoverContent>
                   </Popover>
+                  {errors.eventDate && (
+                    <p className="mt-1 text-sm text-destructive">{errors.eventDate}</p>
+                  )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    Type of Event
+                    Type of Event <span className="text-destructive">*</span>
                   </label>
                   <Select
                     value={formData.eventType}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, eventType: value }))
-                    }
+                    onValueChange={(value) => {
+                      setFormData((prev) => ({ ...prev, eventType: value }));
+                      if (errors.eventType) {
+                        setErrors((prev) => ({ ...prev, eventType: undefined }));
+                      }
+                    }}
                   >
-                    <SelectTrigger className="w-full px-4 py-3 h-auto border-border bg-input">
+                    <SelectTrigger 
+                      className={cn(
+                        "w-full px-4 py-3 h-auto bg-input",
+                        errors.eventType ? "border-destructive" : "border-border"
+                      )}
+                    >
                       <SelectValue placeholder="Select event type" />
                     </SelectTrigger>
                     <SelectContent className="bg-popover">
@@ -245,7 +356,39 @@ export function ContactSection() {
                       ))}
                     </SelectContent>
                   </Select>
+                  {errors.eventType && (
+                    <p className="mt-1 text-sm text-destructive">{errors.eventType}</p>
+                  )}
                 </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="guestCount"
+                  className="block text-sm font-medium text-foreground mb-2"
+                >
+                  Number of Guests <span className="text-destructive">*</span>
+                </label>
+                <div className="relative">
+                  <Users className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input
+                    type="number"
+                    id="guestCount"
+                    name="guestCount"
+                    value={formData.guestCount}
+                    onChange={handleChange}
+                    min="1"
+                    max="1000"
+                    className={cn(
+                      "w-full pl-10 pr-4 py-3 rounded-lg border bg-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors",
+                      errors.guestCount ? "border-destructive" : "border-border"
+                    )}
+                    placeholder="e.g. 50"
+                  />
+                </div>
+                {errors.guestCount && (
+                  <p className="mt-1 text-sm text-destructive">{errors.guestCount}</p>
+                )}
               </div>
 
               <div>
@@ -253,18 +396,23 @@ export function ContactSection() {
                   htmlFor="message"
                   className="block text-sm font-medium text-foreground mb-2"
                 >
-                  Event Details & Special Requests
+                  Event Details & Special Requests <span className="text-destructive">*</span>
                 </label>
                 <textarea
                   id="message"
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
-                  required
                   rows={5}
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors resize-none"
-                  placeholder="Tell us about your event, number of guests, dietary requirements, or any special requests..."
+                  className={cn(
+                    "w-full px-4 py-3 rounded-lg border bg-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors resize-none",
+                    errors.message ? "border-destructive" : "border-border"
+                  )}
+                  placeholder="Tell us about your event, dietary requirements, or any special requests..."
                 />
+                {errors.message && (
+                  <p className="mt-1 text-sm text-destructive">{errors.message}</p>
+                )}
               </div>
 
               <Button
