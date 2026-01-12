@@ -1,0 +1,289 @@
+# Pages CMS Configuration for Sabras Kitchen
+# Documentation: https://pagescms.org/docs/configuration/
+
+# Media configuration for images and videos
+media:
+  - name: images
+    label: Images
+    input: src/assets
+    output: /src/assets
+    categories: [image]
+  - name: videos
+    label: Videos
+    input: public/videos
+    output: /videos
+    categories: [video]
+  - name: recipe-images
+    label: Recipe Images
+    input: public/recipes
+    output: /recipes
+    categories: [image]
+  - name: gallery-images
+    label: Gallery Images
+    input: public/gallery
+    output: /gallery
+    categories: [image]
+
+# Content types
+content:
+  # Recipes Collection
+  - name: recipes
+    label: Recipes
+    type: collection
+    path: content/recipes
+    format: yaml-frontmatter
+    filename: "{slug}.md"
+    view:
+      fields: [title, category, totalTime, servings, publishedAt]
+      primary: title
+      sort: [publishedAt, title, category]
+      default:
+        sort: publishedAt
+        order: desc
+    fields:
+      - name: id
+        label: ID
+        type: uuid
+        required: true
+      - name: title
+        label: Recipe Title
+        type: string
+        required: true
+      - name: slug
+        label: URL Slug
+        type: string
+        required: true
+        description: URL-friendly identifier (e.g., "kenyan-pilau")
+      - name: featuredImage
+        label: Featured Image
+        type: image
+        required: true
+        description: Main image for the recipe (recommended 600x400)
+      - name: category
+        label: Category
+        type: select
+        required: true
+        options:
+          values:
+            - Family-friendly
+            - Dinner
+            - Desserts
+            - Breakfast
+            - Drinks
+            - Salads
+            - Soups
+      - name: ingredients
+        label: Ingredients
+        type: string
+        list: true
+        required: true
+        description: List all ingredients with quantities
+      - name: instructions
+        label: Instructions
+        type: string
+        list: true
+        required: true
+        description: Step-by-step cooking instructions
+      - name: prepTime
+        label: Prep Time
+        type: string
+        required: true
+        description: "e.g., 20 mins"
+      - name: cookTime
+        label: Cook Time
+        type: string
+        required: true
+        description: "e.g., 45 mins"
+      - name: totalTime
+        label: Total Time
+        type: string
+        required: true
+        description: "e.g., 1 hr 5 mins"
+      - name: servings
+        label: Servings
+        type: number
+        required: true
+        default: 4
+      - name: notes
+        label: Chef's Notes
+        type: text
+        description: Optional tips or notes about the recipe
+      - name: publishedAt
+        label: Publish Date
+        type: date
+        required: true
+      - name: body
+        label: Additional Content
+        type: rich-text
+        description: Optional additional content or story about the recipe
+
+  # Gallery Images Collection
+  - name: gallery
+    label: Gallery Images
+    type: collection
+    path: content/gallery
+    format: yaml
+    filename: "{slug}.yml"
+    view:
+      fields: [title, image]
+      primary: title
+      sort: [order, title]
+      default:
+        sort: order
+        order: asc
+    fields:
+      - name: id
+        label: ID
+        type: uuid
+        required: true
+      - name: slug
+        label: Slug
+        type: string
+        required: true
+        description: Unique identifier for the image
+      - name: image
+        label: Image
+        type: image
+        required: true
+        description: Gallery image (recommended 600x600 or 16:9 ratio)
+      - name: title
+        label: Title
+        type: string
+        required: true
+        description: Display title for the image
+      - name: altText
+        label: Alt Text
+        type: string
+        required: true
+        description: Accessibility description of the image
+      - name: order
+        label: Display Order
+        type: number
+        default: 0
+        description: Lower numbers appear first
+
+  # Hero Section Settings (Single File)
+  - name: hero
+    label: Hero Section
+    type: file
+    path: content/settings/hero.yml
+    format: yaml
+    fields:
+      - name: mediaType
+        label: Media Type
+        type: select
+        required: true
+        default: image
+        options:
+          values:
+            - label: Image
+              value: image
+            - label: Video
+              value: video
+        description: Choose whether to display an image or video as the hero background
+      - name: heroImage
+        label: Hero Image
+        type: image
+        description: Background image for hero section (used when Media Type is "image")
+      - name: heroVideo
+        label: Hero Video
+        type: file
+        description: Background video for hero section (used when Media Type is "video"). Upload MP4 format.
+        options:
+          accept: ".mp4,.webm,.mov"
+      - name: heroVideoFallback
+        label: Video Fallback Image
+        type: image
+        description: Fallback image shown while video loads or on unsupported browsers
+      - name: headline
+        label: Headline
+        type: string
+        required: true
+        default: "Crafting Delicious Moments,"
+      - name: headlineAccent
+        label: Headline Accent
+        type: string
+        required: true
+        default: "The Sabras Way."
+        description: The highlighted part of the headline
+      - name: subheadline
+        label: Subheadline
+        type: text
+        required: true
+        default: "Authentic Kenyan catering for events, celebrations & everyday moments."
+      - name: primaryButtonText
+        label: Primary Button Text
+        type: string
+        default: "Explore Menu & Services"
+      - name: primaryButtonLink
+        label: Primary Button Link
+        type: string
+        default: "#services"
+      - name: secondaryButtonText
+        label: Secondary Button Text
+        type: string
+        default: "Contact Us"
+      - name: secondaryButtonLink
+        label: Secondary Button Link
+        type: string
+        default: "#contact"
+
+  # Site Settings (Single File)
+  - name: settings
+    label: Site Settings
+    type: file
+    path: content/settings/site.yml
+    format: yaml
+    fields:
+      - name: siteName
+        label: Site Name
+        type: string
+        default: "Sabras Kitchen"
+      - name: tagline
+        label: Tagline
+        type: string
+        default: "Authentic Kenyan Flavors"
+      - name: phone
+        label: Phone Number
+        type: string
+      - name: email
+        label: Email Address
+        type: string
+      - name: address
+        label: Address
+        type: text
+      - name: socialLinks
+        label: Social Media Links
+        type: object
+        fields:
+          - name: facebook
+            label: Facebook URL
+            type: string
+          - name: instagram
+            label: Instagram URL
+            type: string
+          - name: twitter
+            label: Twitter/X URL
+            type: string
+          - name: youtube
+            label: YouTube URL
+            type: string
+
+# Reusable components
+components:
+  seo:
+    label: SEO Settings
+    type: object
+    fields:
+      - name: metaTitle
+        label: Meta Title
+        type: string
+        description: SEO title (max 60 characters)
+      - name: metaDescription
+        label: Meta Description
+        type: text
+        description: SEO description (max 160 characters)
+      - name: ogImage
+        label: Social Share Image
+        type: image
+        description: Image for social media sharing (1200x630 recommended)
