@@ -1,0 +1,14 @@
+# Hero Section Settings
+# Edit this file to change the hero section background and content
+
+mediaType: image
+heroImage: /src/assets/hero-food.jpg
+heroVideo: null
+heroVideoFallback: null
+headline: "Crafting Delicious Moments,"
+headlineAccent: "The Sabras Way."
+subheadline: "Authentic Kenyan catering for events, celebrations & everyday moments."
+primaryButtonText: "Explore Menu & Services"
+primaryButtonLink: "#services"
+secondaryButtonText: "Contact Us"
+secondaryButtonLink: "#contact"
