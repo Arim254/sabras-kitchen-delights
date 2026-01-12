@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Mail, Phone, MapPin, Send, MessageCircle, CalendarIcon, Users, Clock, DollarSign } from "lucide-react";
+import { useState, useRef } from "react";
+import { Mail, Phone, MapPin, Send, MessageCircle, CalendarIcon, Users, Clock, DollarSign, Download, Upload, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -27,6 +27,7 @@ interface FormErrors {
   guestCount?: string;
   budgetPerPerson?: string;
   message?: string;
+  menuFile?: string;
 }
 
 export function ContactSection() {
@@ -40,8 +41,11 @@ export function ContactSection() {
     budgetPerPerson: "",
     message: "",
   });
+  const [menuFile, setMenuFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const { toast } = useToast();
 
   const timeSlots = [
@@ -145,25 +149,62 @@ export function ContactSection() {
 
     setIsSubmitting(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append("name", formData.name);
+      formDataToSend.append("email", formData.email);
+      formDataToSend.append("eventDate", formData.eventDate ? format(formData.eventDate, "dd/MM/yyyy") : "");
+      formDataToSend.append("eventTime", formData.eventTime);
+      formDataToSend.append("eventType", formData.eventType);
+      formDataToSend.append("guestCount", formData.guestCount);
+      formDataToSend.append("budgetPerPerson", `KES ${formData.budgetPerPerson}`);
+      formDataToSend.append("message", formData.message);
+      
+      if (menuFile) {
+        formDataToSend.append("menuSelection", menuFile);
+      }
 
-    toast({
-      title: "Inquiry Sent!",
-      description: "Thank you for your inquiry. We'll get back to you soon.",
-    });
+      const response = await fetch("https://formspree.io/f/xvzzozbo", {
+        method: "POST",
+        body: formDataToSend,
+        headers: {
+          Accept: "application/json",
+        },
+      });
 
-    setFormData({ 
-      name: "", 
-      email: "", 
-      eventDate: undefined, 
-      eventTime: "",
-      eventType: "", 
-      guestCount: "", 
-      budgetPerPerson: "",
-      message: "" 
-    });
-    setErrors({});
-    setIsSubmitting(false);
+      if (response.ok) {
+        toast({
+          title: "Inquiry Sent!",
+          description: "Thank you for your inquiry. We'll get back to you soon.",
+        });
+
+        setFormData({ 
+          name: "", 
+          email: "", 
+          eventDate: undefined, 
+          eventTime: "",
+          eventType: "", 
+          guestCount: "", 
+          budgetPerPerson: "",
+          message: "" 
+        });
+        setMenuFile(null);
+        setErrors({});
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      } else {
+        throw new Error("Form submission failed");
+      }
+    } catch (error) {
+      toast({
+        title: "Submission Failed",
+        description: "There was an error sending your inquiry. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (
@@ -174,6 +215,24 @@ export function ContactSection() {
     // Clear error when user starts typing
     if (errors[name as keyof FormErrors]) {
       setErrors((prev) => ({ ...prev, [name]: undefined }));
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type (PDF only)
+      if (file.type !== "application/pdf") {
+        setErrors((prev) => ({ ...prev, menuFile: "Please upload a PDF file" }));
+        return;
+      }
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        setErrors((prev) => ({ ...prev, menuFile: "File size must be less than 10MB" }));
+        return;
+      }
+      setMenuFile(file);
+      setErrors((prev) => ({ ...prev, menuFile: undefined }));
     }
   };
 
@@ -274,7 +333,31 @@ export function ContactSection() {
             <h3 className="font-serif text-2xl font-semibold text-foreground mb-6">
               Book Your Event
             </h3>
-            <form onSubmit={handleSubmit} className="space-y-5">
+
+            {/* Menu Download Section */}
+            <div className="mb-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <FileText className="text-primary" size={20} />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-medium text-foreground mb-1">Download Our Menu</h4>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Download our menu selection form, choose your preferred items, and upload it back with your booking.
+                  </p>
+                  <a
+                    href="/Sabras_menu_items.pdf"
+                    download="Sabras_Menu_Selection.pdf"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors"
+                  >
+                    <Download size={16} />
+                    Download Menu PDF
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label
                   htmlFor="name"
@@ -498,6 +581,61 @@ export function ContactSection() {
                     <p className="mt-1 text-sm text-destructive">{errors.budgetPerPerson}</p>
                   )}
                 </div>
+              </div>
+
+              {/* Menu Upload Section */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Upload Completed Menu Selection
+                </label>
+                <div 
+                  className={cn(
+                    "relative border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors hover:border-primary/50",
+                    menuFile ? "border-primary bg-primary/5" : "border-border",
+                    errors.menuFile && "border-destructive"
+                  )}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                  {menuFile ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <FileText className="text-primary" size={20} />
+                      <span className="text-sm text-foreground font-medium">{menuFile.name}</span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMenuFile(null);
+                          if (fileInputRef.current) {
+                            fileInputRef.current.value = "";
+                          }
+                        }}
+                        className="ml-2 text-muted-foreground hover:text-destructive transition-colors"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2">
+                      <Upload className="text-muted-foreground" size={24} />
+                      <span className="text-sm text-muted-foreground">
+                        Click to upload your completed menu PDF
+                      </span>
+                    </div>
+                  )}
+                </div>
+                {errors.menuFile && (
+                  <p className="mt-1 text-sm text-destructive">{errors.menuFile}</p>
+                )}
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Optional: Upload the menu form after selecting your preferred items
+                </p>
               </div>
 
               <div>
