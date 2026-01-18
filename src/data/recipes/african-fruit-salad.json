@@ -1,0 +1,30 @@
+{
+  "title": "African Fruit Salad",
+  "slug": "african-fruit-salad",
+  "featuredImage": "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=600",
+  "category": "Salads",
+  "ingredients": [
+    "2 mangoes, cubed",
+    "1 papaya, cubed",
+    "2 bananas, sliced",
+    "1 cup pineapple chunks",
+    "Seeds of 2 passion fruits",
+    "Juice of 2 oranges",
+    "2 tbsp honey",
+    "Fresh mint for garnish"
+  ],
+  "instructions": [
+    "Prepare all fruits and place in a large bowl",
+    "Mix orange juice with honey",
+    "Pour dressing over fruits and toss gently",
+    "Add passion fruit seeds on top",
+    "Garnish with fresh mint",
+    "Chill before serving"
+  ],
+  "prepTime": "15 mins",
+  "cookTime": "0 mins",
+  "totalTime": "15 mins",
+  "servings": 6,
+  "notes": "Use seasonal tropical fruits for best flavor.",
+  "publishedAt": "2024-02-20"
+}

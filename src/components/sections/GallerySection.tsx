@@ -1,12 +1,34 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { X } from "lucide-react";
-import { galleryImages } from "@/data/mockData";
+
+interface GalleryImage {
+  id: string;
+  image: string;
+  title: string;
+  altText: string;
+}
 
 export function GallerySection() {
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [hoverPosition, setHoverPosition] = useState<number>(0.5);
   const navRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchGalleryImages = async () => {
+      const imageModules = import.meta.glob('@/data/gallery/*.json');
+      const images = await Promise.all(
+        Object.entries(imageModules).map(async ([path, loader]) => {
+          const module = await loader();
+          return { id: path, ...(module as any) };
+        })
+      );
+      setGalleryImages(images);
+    };
+
+    fetchGalleryImages();
+  }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>, index: number) => {
     const element = e.currentTarget;
@@ -79,8 +101,8 @@ export function GallerySection() {
               className="relative flex-1 h-full cursor-pointer group"
               style={{
                 transformStyle: "preserve-3d",
-                transition: hoveredIndex !== null 
-                  ? "transform 70ms ease-out, filter 150ms ease-out, flex 300ms ease-out" 
+                transition: hoveredIndex !== null
+                  ? "transform 70ms ease-out, filter 150ms ease-out, flex 300ms ease-out"
                   : "transform 250ms ease-out, filter 300ms ease-out, flex 300ms ease-out",
                 flex: hoveredIndex === index ? 3 : 1,
                 ...getTransformStyle(index),

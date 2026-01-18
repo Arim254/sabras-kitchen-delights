@@ -1,0 +1,29 @@
+{
+  "title": "Kenyan Mandazi",
+  "slug": "kenyan-mandazi",
+  "featuredImage": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600",
+  "category": "Breakfast",
+  "ingredients": [
+    "3 cups flour",
+    "1/2 cup sugar",
+    "1 tsp cardamom powder",
+    "1/2 cup coconut milk",
+    "1 egg",
+    "1 tsp instant yeast",
+    "Oil for deep frying"
+  ],
+  "instructions": [
+    "Mix flour, sugar, cardamom, and yeast",
+    "Add coconut milk and egg, mix to form dough",
+    "Knead until smooth, cover and let rise for 1 hour",
+    "Roll out dough and cut into triangles",
+    "Deep fry until golden brown on both sides",
+    "Drain on paper towels and serve warm"
+  ],
+  "prepTime": "20 mins",
+  "cookTime": "20 mins",
+  "totalTime": "1 hr 40 mins",
+  "servings": 12,
+  "notes": "Perfect with chai tea for breakfast or as a snack.",
+  "publishedAt": "2024-02-15"
+}

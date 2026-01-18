@@ -1,0 +1,158 @@
+Integrating PagesCMS into Your Website
+PagesCMS is a free, open-source CMS for static sites on GitHub[1][2]. In practice, you add a small configuration file (.pages.yml) to your site's GitHub repo and then use a web interface to edit content. PagesCMS presents a user-friendly UI (with rich-text editors and drag-and-drop media) on top of your Markdown/JSON files, committing every change back to GitHub. In other words, non-technical editors can manage pages, blog posts, images, etc. through PagesCMS, while developers keep their normal build/deploy workflow (GitHub Pages, Netlify, Vercel, etc.)[3][4].
+Key Features & Supported Frameworks
+* Static-site focus: Works with all popular static site generators. Examples include Jekyll, Hugo, Eleventy, Next.js, Nuxt.js, Astro, VuePress, Docusaurus, Gatsby, Pelican, and many more[5][6]. (One blog notes support for "Jekyll, Next.js, Astro, Hugo and others"[7].) You can even use it with plain HTML/CSS sites, since it just edits flat files in Git.
+* GitHub-based: PagesCMS only supports GitHub repositories (it does not yet support GitLab/Bitbucket)[8]. Editors sign in with GitHub (or use a fine-grained PAT) and grant the app access to the repo. All content edits become commits in that repo, so your usual CI/CD deploy pipeline picks them up[3][4].
+* Zero infrastructure: No database or server setup is needed for your content - everything lives in your Git repo[9]. PagesCMS itself is a web app (can be self-hosted or used as a service) that reads/writes your files via the GitHub API.
+* Free & Open Source: PagesCMS is MIT-licensed and 100% free to use[10][11]. You can use the hosted service at app.pagescms.org (run by the project) or deploy your own copy (e.g. on Vercel or Cloudflare Pages[11]).
+* User-friendly UI: The CMS offers a modern, mobile-optimized interface. Features include a rich-text editor (WYSIWYG with Markdown support), code editor for frontmatter, a drag-and-drop media manager (for uploading images/files)[12], and fast full-text search across content[13]. You can customize content types, views, and field schemas in the config.
+* Collaborative editing: You sign in with GitHub, but you can also invite users by email (they get a magic link to log in). This lets non-developers edit without needing their own GitHub accounts[14][15].
+* Zero-code setup: Getting started typically means adding one config file to your repo (no need to write any backend code)[1][16].
+Technical Requirements
+* GitHub repository: Your site's code must live in a GitHub repo (private or public). PagesCMS will read and write files via GitHub's API. It does not support GitLab/Bitbucket as of now[8].
+* Static site code: PagesCMS works by editing the same files your static site generator uses. It supports common file types: Markdown (with frontmatter in YAML/JSON/TOML), standalone YAML/JSON/TOML, and even HTML/JS files[17]. Just ensure your site (Jekyll/Hugo/Next/etc.) can rebuild from those files as usual.
+* Hosting: The static site itself can be hosted anywhere: GitHub Pages, Netlify, Vercel, Cloudflare Pages, etc. Because PagesCMS commits to Git, your normal deploy (triggered by pushes) will publish the changes[4]. For example, if you use GitHub Pages, a commit to the main branch can automatically rebuild the site; if you use Netlify/Vercel, their CI will trigger on the push.
+* PagesCMS app: To use the hosted PagesCMS, you only need a browser and GitHub login. For self-hosting, you need a Node.js environment (e.g. deploy the pages-cms/pages-cms code on Vercel or similar), plus a GitHub App or OAuth credentials (detailed in their README). Self-hosting is optional - most teams use the official free hosted app.
+edia: Define where uploads go. For example, you can set:
+  media:
+  input: src/images
+  output: /images
+  Here input is the path in your repo (e.g. src/images), and output is the public URL path your site will use (e.g. /images)[21]. You can also specify allowed extensions or categories. (You may use a single string shortcut, e.g. media: images means both input and output are /images[22].)
+5. Content: Under content: list each content type your site needs. Each entry is either a collection (a folder of multiple similar files, like blog posts) or a file (a single item, like a homepage or config). For each, specify:
+o name (machine name, unique), label (display name in CMS)
+o type: collection or file
+o path: folder or file path in the repo (e.g. _posts for Jekyll posts)[23]
+o fields: the schema of frontmatter fields (title, date, body, etc.)[23]
+o Optionally, view settings for collections (which fields to list, how to sort/search).
+For example, a simple config for a Jekyll blog might look like this[24][25]:
+
+media: media
+content:
+  - name: posts
+    label: Posts
+    type: collection
+    path: '_posts'
+    view:
+      fields: [title, date, published]
+    fields:
+      - name: title
+        type: string
+      - name: date
+        type: date
+      - name: published
+        type: boolean
+        default: false
+      - name: body
+        type: rich-text
+  - name: config
+    label: Site Config
+    type: file
+    path: '_config.yml'
+    fields:
+      - name: title
+        type: string
+      - name: description
+        type: string
+This sets up a Posts collection (editing files in _posts) and a Site Config file (_config.yml). See Examples for more sample configs.
+1. Commit and refresh. Once your .pages.yml is committed, go back to PagesCMS. Refresh the page or re-open your repo in the CMS. Now you should see your defined content types (e.g. "Posts") in the sidebar. If you had it open already, PagesCMS should detect the new config automatically[20].
+2. Edit and manage content. Use the PagesCMS interface to create, edit, and delete entries:
+3. Creating items: Click the appropriate content type (e.g. "Posts") and add a new item. PagesCMS will generate a new file (e.g. a new markdown file with frontmatter) using your filename pattern.
+4. Editing: Fill in fields in the form or rich-text editor. For Markdown "body" fields, the rich-text editor handles formatting and images.
+5. Media: Use the built-in media browser to upload images/files into your specified folder (with drag-and-drop or file picker)[12]. Uploaded files are committed to the repo under your media.input path.
+6. Saving: When you save or publish a change, PagesCMS makes a commit to your GitHub repo automatically. Each change appears as a commit on the selected branch.
+7. Inviting editors: You can invite teammates (via email) to collaborate, or they log in with their own GitHub accounts (they'll need permission to the repo).
+Configuring PagesCMS (.pages.yml)
+The core of integration is the .pages.yml file in your repository. This YAML file tells PagesCMS how to find and structure your content:
+* Media section: Defines upload folders. It can be a single path or an object/array. For example:
+
+  media:
+  input: assets/images
+  output: /images
+  This means "upload files into assets/images in the repo, and serve them from /images on the website"[21]. You can set multiple media entries with names, allowed extensions, etc. (See Media docs for details.)
+* Content section: An array where each entry defines a content type. Key properties (all shown in the docs table[23]):
+* name (string, unique): machine key, e.g. posts.
+* label (string): human name for UI menu.
+* type: either collection (a folder of items) or file (a single file).
+* path: where to find the files (if collection, this is a folder path; if file, the path to that single file).
+* fields: an array of field definitions (name, type, label, default, etc.) corresponding to your frontmatter fields. Field types include string, number, boolean, date, rich-text (full WYSIWYG), image, file, reference, and more[26][23].
+* For collection types you can also specify a view object to control list columns, default sorting/searching, etc.
+* Components (optional): A way to define reusable field groups if you have repeating schemas. Advanced use (see docs).
+After setting up .pages.yml, any changes will reflect in the CMS UI automatically.
+Example: Structuring a Jekyll Site
+Suppose you have a Jekyll blog with a _posts/ folder for blog posts and _config.yml for site settings. You want editors to update posts and site title/description via a CMS. Your .pages.yml might include:
+media: media
+content:
+  - name: posts
+    label: Blog Posts
+    type: collection
+    path: '_posts'
+    view:
+      fields: [title, date, published]
+    fields:
+      - name: title
+        label: Title
+        type: string
+      - name: date
+        label: Date
+        type: date
+      - name: published
+        label: Published
+        type: boolean
+        default: false
+      - name: body
+        label: Content
+        type: rich-text
+  - name: config
+    label: Site Config
+    type: file
+    path: '_config.yml'
+    fields:
+      - name: title
+        label: Site Title
+        type: string
+      - name: description
+        label: Site Description
+        type: string
+Here, Posts is a collection of markdown files in _posts (with frontmatter fields title, date, published, body). Site Config is a single-file entry editing _config.yml (with title and description fields). The media folder is media/, so uploaded images will go into that folder (you'd reference them from your site's templates via /media/...).
+Once committed, in PagesCMS you'd see "Blog Posts" and "Site Config" in the sidebar. Creating or editing a post will create/modify a Markdown file in _posts. Saving the site title here updates _config.yml. Every save is a GitHub commit.
+(These examples are adapted from the official PagesCMS documentation[27][25].)
+Deployment Workflow
+Because PagesCMS works through Git commits, your deployment process is unchanged: edits in the CMS simply become code changes in your repo, and your static site build/deploy picks them up. In practice:
+* Edit via CMS ? Commit to Git: When an editor saves changes, PagesCMS pushes a commit to the repository (on the selected branch).
+* CI/CD triggers: Your site's build/deploy (GitHub Pages, Netlify, Vercel, etc.) should be configured to run on GitHub push. For example, if using GitHub Pages, enabling Pages on the main branch means any new commit rebuilds the site. If using Netlify/Vercel, their webhook/CI will detect the push and redeploy[4].
+* Content appears on live site: After your usual build (Jekyll build, Next.js build, etc.), the updated content is live. You don't need extra steps - PagesCMS just modifies source files.
+In short, PagesCMS commits changes, and your normal pipeline handles deployment[4].
+Troubleshooting & Limitations
+* GitHub-only: PagesCMS works only with GitHub repos[8]. It cannot directly edit sites hosted elsewhere. If you need GitLab or Bitbucket, you'd have to self-host PagesCMS and add that support yourself.
+* Authentication/Permissions: The first time you sign in, GitHub may ask for broad repo access (this is an OAuth limitation). If this is a concern, you can use a fine-grained Personal Access Token instead (sign in via PAT on the login screen). Ensure the GitHub App (for self-host) or OAuth app has the right scopes to read/write your repo.
+* .pages.yml errors: Syntax errors in .pages.yml can break the CMS UI. If PagesCMS shows a config error, check your YAML indentation and keys. The browser's console often shows parse errors if the file is invalid.
+* No config file: If you open PagesCMS on a repo/branch without a .pages.yml, it will prompt you to create one[28]. Use that or add the file manually.
+* Media upload limits: Currently the serverless backend has file-size limits. Some users report failing to upload even moderately sized videos (e.g. MP4s under 4 MB) through the UI[29]. Workarounds: upload large files (images/videos) to the repo via Git/Git LFS manually, or split files. Small images (JPEG/PNG) usually work fine via drag-and-drop.
+* Preview/Caching: Remember that after you edit content in PagesCMS and save, you might need to wait for your site to rebuild. If you don't see updates, ensure your deploy pipeline ran successfully. Also check that media.output paths align with where your site expects images (a mismatch can make images 404).
+* Field support: PagesCMS supports many field types, but if you need complex/custom field behavior, you may need to extend it or use components. (The docs show how to create custom fields.) Out of the box, you're limited to the provided types (text, number, rich-text, image, reference, etc.).
+* Future features: As of version 1.0, some advanced features (like scheduling, granular permissions, inline comments) are "coming soon". Check the GitHub Issues for known bugs or planned features.
+If you encounter issues, a good first step is to check the PagesCMS Discord or GitHub Discussions for help.
+Resources
+* Official Documentation: PagesCMS docs walk through configuration fields and examples: pagescms.org/docs[30]. In particular, see "Configuration" for the .pages.yml schema.
+* GitHub Repository: The source code and README are at github.com/pages-cms/pages-cms[5]. The README includes deployment steps if you want to self-host.
+* Demo & App: Try the live demo or sign in at app.pagescms.org (requires GitHub login). There's also a quick video intro.
+* Community: For questions or support, join the Discord or open an issue on GitHub.
+By following these steps and using the official guides, you can add PagesCMS to your static site and give content editors a simple interface to update the site. The CMS abstracts away Git and frontmatter, letting your team work more efficiently with your existing static site workflow[3][1].
+Sources: Official PagesCMS docs and repo[1][20][23][27][25], GitHub Marketplace description[5][10], and community articles[3][4][29]. These provide detailed technical information on setup, configuration, and usage.
+
+[1] [19] Getting started - Pages CMS
+https://pagescms.org/docs/
+[2] [3] [4] [6] [9] [11] [15] [16] [17] Pages CMS: The No-Hassle, Open-Source CMS for Static Sites on GitHub - Bright Coding - Blog pour les developpeurs
+https://www.blog.brightcoding.dev/2025/08/30/pages-cms-the-no-hassle-open-source-cms-for-static-sites-on-github/
+[5] [18] [30] GitHub - pages-cms/pages-cms: The No-Hassle CMS for Static Sites Generators
+https://github.com/pages-cms/pages-cms
+[7] Making editing static sites easier | Tom Donohue's Blog
+https://monodot.co.uk/static-sites-pages-cms/
+[8] [10] [12] [13] [14] Pages CMS: The No-Hassle CMS for Static Sites Generators
+https://pagescms.org/
+[20] [21] [22] [23] [26] [28] Configuration - Pages CMS
+https://pagescms.org/docs/configuration/
+[24] [25] [27] Examples - Pages CMS
+https://pagescms.org/docs/examples/
+[29] Failed to upload file: 413 � Issue #284 � pages-cms/pages-cms � GitHub
+https://github.com/pages-cms/pages-cms/issues/284

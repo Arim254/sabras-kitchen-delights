@@ -1,14 +1,37 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Clock, Users, Search } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { recipes, categories } from "@/data/mockData";
+import { Recipe } from "@/data/mockData";
 
 const RecipesPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      const recipeModules = import.meta.glob('@/data/recipes/*.json');
+      const recipesData = await Promise.all(
+        Object.entries(recipeModules).map(async ([path, loader]) => {
+          const module = await loader();
+          return { id: path, ...(module as any) };
+        })
+      );
+      setRecipes(recipesData);
+    };
+
+    const fetchCategories = async () => {
+      const categoriesModule = await import('@/data/categories.json');
+      setCategories(categoriesModule.default);
+    };
+
+    fetchRecipes();
+    fetchCategories();
+  }, []);
+
   const activeCategory = searchParams.get("category") || "All";
 
   const filteredRecipes = useMemo(() => {

@@ -1,0 +1,29 @@
+{
+  "title": "Sukuma Wiki with Ugali",
+  "slug": "sukuma-wiki-ugali",
+  "featuredImage": "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600",
+  "category": "Family-friendly",
+  "ingredients": [
+    "1 large bunch sukuma wiki (collard greens)",
+    "2 tomatoes, diced",
+    "1 onion, sliced",
+    "2 cloves garlic",
+    "Salt and pepper to taste",
+    "2 cups maize flour for ugali",
+    "4 cups water"
+  ],
+  "instructions": [
+    "Wash and chop sukuma wiki finely",
+    "Sauté onions until translucent, add tomatoes and garlic",
+    "Add sukuma wiki, season and cook until tender",
+    "For ugali: Boil water, gradually add maize flour while stirring",
+    "Stir continuously until thick and pulls away from pot",
+    "Serve sukuma wiki alongside ugali"
+  ],
+  "prepTime": "15 mins",
+  "cookTime": "25 mins",
+  "totalTime": "40 mins",
+  "servings": 4,
+  "notes": "A staple Kenyan meal - nutritious and affordable.",
+  "publishedAt": "2024-02-10"
+}

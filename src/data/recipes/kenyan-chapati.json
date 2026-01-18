@@ -1,0 +1,27 @@
+{
+  "title": "Kenyan Chapati",
+  "slug": "kenyan-chapati",
+  "featuredImage": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=600",
+  "category": "Family-friendly",
+  "ingredients": [
+    "3 cups all-purpose flour",
+    "1 tsp salt",
+    "1 cup warm water",
+    "3 tbsp vegetable oil",
+    "Oil for frying"
+  ],
+  "instructions": [
+    "Mix flour and salt in a large bowl",
+    "Add water gradually, kneading to form a soft dough",
+    "Add oil and knead for 10 minutes until smooth",
+    "Cover and rest for 30 minutes",
+    "Divide into balls, roll thin, brush with oil, fold and roll again",
+    "Cook on hot pan, brushing with oil until golden on both sides"
+  ],
+  "prepTime": "15 mins",
+  "cookTime": "30 mins",
+  "totalTime": "45 mins",
+  "servings": 8,
+  "notes": "The key to soft chapatis is well-kneaded dough and not overworking when rolling.",
+  "publishedAt": "2024-01-20"
+}

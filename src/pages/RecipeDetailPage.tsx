@@ -1,13 +1,30 @@
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Clock, Users, ChefHat, ArrowLeft, Share2, Facebook, Twitter } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
-import { recipes } from "@/data/mockData";
+import { Recipe } from "@/data/mockData";
 
 const RecipeDetailPage = () => {
   const { slug } = useParams<{ slug: string }>();
-  const recipe = recipes.find((r) => r.slug === slug);
+  const [recipe, setRecipe] = useState<Recipe | null>(null);
+
+  useEffect(() => {
+    const fetchRecipe = async () => {
+      try {
+        const module = await import(`../data/recipes/${slug}.json`);
+        setRecipe(module.default);
+      } catch (error) {
+        console.error("Failed to load recipe:", error);
+        setRecipe(null);
+      }
+    };
+
+    if (slug) {
+      fetchRecipe();
+    }
+  }, [slug]);
 
   if (!recipe) {
     return (

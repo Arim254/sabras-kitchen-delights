@@ -1,0 +1,27 @@
+{
+  "title": "Mango Passion Smoothie",
+  "slug": "mango-passion-smoothie",
+  "featuredImage": "https://images.unsplash.com/photo-1546173159-315724a31696?w=600",
+  "category": "Drinks",
+  "ingredients": [
+    "2 ripe mangoes, cubed",
+    "4 passion fruits, pulp extracted",
+    "1 cup yogurt",
+    "1/2 cup milk",
+    "2 tbsp honey",
+    "Ice cubes"
+  ],
+  "instructions": [
+    "Blend mango cubes until smooth",
+    "Add passion fruit pulp, yogurt, and milk",
+    "Add honey and ice cubes",
+    "Blend until creamy and smooth",
+    "Serve immediately in chilled glasses"
+  ],
+  "prepTime": "10 mins",
+  "cookTime": "0 mins",
+  "totalTime": "10 mins",
+  "servings": 4,
+  "notes": "Best served immediately. Add more honey if you prefer a sweeter taste.",
+  "publishedAt": "2024-02-01"
+}

@@ -1,0 +1,49 @@
+media:
+  input: public/uploads
+  output: /uploads
+
+content:
+  - name: gallery
+    label: Gallery
+    type: collection
+    path: "src/data/gallery"
+    view:
+      fields: [title, image]
+    fields:
+      - name: title
+        type: string
+      - name: image
+        type: image
+      - name: altText
+        type: string
+  - name: recipes
+    label: Recipes
+    type: collection
+    path: "src/data/recipes"
+    view:
+      fields: [title, category, publishedAt]
+    fields:
+      - name: title
+        type: string
+      - name: slug
+        type: string
+      - name: featuredImage
+        type: image
+      - name: category
+        type: string
+      - name: ingredients
+        type: list
+      - name: instructions
+        type: list
+      - name: prepTime
+        type: string
+      - name: cookTime
+        type: string
+      - name: totalTime
+        type: string
+      - name: servings
+        type: number
+      - name: notes
+        type: rich-text
+      - name: publishedAt
+        type: date
