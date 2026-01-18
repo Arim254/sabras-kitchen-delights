@@ -1,0 +1,32 @@
+---
+id: "1"
+title: "Traditional Kenyan Pilau"
+slug: "kenyan-pilau"
+featuredImage: "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=600"
+category: "Dinner"
+ingredients:
+  - "2 cups basmati rice"
+  - "500g beef, cubed"
+  - "2 large onions, sliced"
+  - "4 cloves garlic, minced"
+  - "1 inch ginger, grated"
+  - "2 tbsp pilau masala"
+  - "1 cinnamon stick"
+  - "4 cardamom pods"
+  - "Salt to taste"
+  - "3 cups beef stock"
+instructions:
+  - "Wash and soak rice for 30 minutes, then drain"
+  - "In a heavy pot, fry onions until deep brown and caramelized"
+  - "Add meat and brown on all sides"
+  - "Add garlic, ginger, and all spices. Cook for 2 minutes"
+  - "Pour in beef stock and bring to a boil"
+  - "Add rice, reduce heat, cover and cook for 20 minutes"
+  - "Let rest for 5 minutes before serving"
+prepTime: "20 mins"
+cookTime: "45 mins"
+totalTime: "1 hr 5 mins"
+servings: 6
+notes: "For extra flavor, fry the whole spices in ghee before adding other ingredients."
+publishedAt: "2024-01-15"
+---
