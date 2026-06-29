@@ -1,0 +1,30 @@
+{
+  "title": "Nyama Choma with Ugali",
+  "slug": "nyama-choma-ugali",
+  "featuredImage": "https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=2069&auto=format&fit=crop",
+  "category": "Main Course",
+  "ingredients": [
+    "1kg beef ribs or goat meat",
+    "3 tbsp vegetable oil",
+    "Juice of 2 lemons",
+    "4 cloves garlic, minced",
+    "1 tbsp ginger, grated",
+    "Salt and pepper to taste",
+    "2 cups maize flour",
+    "4 cups water"
+  ],
+  "instructions": [
+    "Marinate meat with lemon juice, garlic, ginger, salt, and pepper for at least 2 hours.",
+    "Grill over medium-hot charcoal, turning occasionally, until cooked through and slightly charred.",
+    "For ugali: Bring water to a boil in a heavy-bottomed pot.",
+    "Gradually add maize flour while stirring continuously with a wooden spoon.",
+    "Cook until thick and smooth, about 5-7 minutes. Mold into a dome shape.",
+    "Serve nyama choma hot with ugali and kachumbari."
+  ],
+  "prepTime": "2 hrs 30 mins",
+  "cookTime": "45 mins",
+  "totalTime": "3 hrs 15 mins",
+  "servings": 6,
+  "notes": "Traditional Kenyan nyama choma is best enjoyed outdoors with friends and family. Serve with extra chili sauce on the side.",
+  "publishedAt": "2024-03-10"
+}

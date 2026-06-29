@@ -40,26 +40,26 @@ export function GallerySection() {
 
   const getTransformStyle = (index: number) => {
     if (hoveredIndex === null) return {};
-    
+
     const totalImages = galleryImages.length;
     const normalizedIndex = index / (totalImages - 1);
     const normalizedHover = hoveredIndex / (totalImages - 1);
     const diff = normalizedIndex - normalizedHover;
     const distance = Math.abs(diff);
-    
+
     // Cosine falloff for smooth transitions
     const falloff = Math.max(0, Math.cos(Math.min(distance * 2.5, 1) * Math.PI * 0.5));
-    
+
     // Calculate tilt based on position relative to hovered item
     const tiltDirection = Math.sign(diff);
     const tilt = tiltDirection * falloff * 15;
-    
+
     // Calculate z-translation (depth)
     const zTranslate = falloff * 80;
-    
+
     // Calculate scale
     const scale = 1 + falloff * 0.15;
-    
+
     return {
       transform: `
         perspective(2000px)
@@ -77,11 +77,11 @@ export function GallerySection() {
       <div className="container mx-auto px-4 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12 lg:mb-16">
-          <span className="text-primary font-medium text-sm uppercase tracking-wider">
-            Our Work
+          <span className="text-primary font-medium text-sm uppercase tracking-[0.2em] font-sans">
+            Moments Captured
           </span>
-          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mt-2 mb-4">
-            Gallery
+          <h2 className="section-title mt-3 mb-4 gold-accent inline-block pb-3">
+            Our Gallery
           </h2>
           <p className="text-muted-foreground">
             A glimpse into our culinary creations and the events we've had the honor to cater.
@@ -89,7 +89,7 @@ export function GallerySection() {
         </div>
 
         {/* 3D Perspective Gallery */}
-        <div 
+        <div
           ref={navRef}
           className="relative h-[300px] md:h-[400px] lg:h-[500px] flex items-end gap-1 md:gap-2"
           style={{ perspective: "2000px", transformStyle: "preserve-3d" }}
@@ -111,26 +111,28 @@ export function GallerySection() {
               onClick={() => setSelectedImage(item.image)}
             >
               {/* Image Container */}
-              <div 
-                className="absolute inset-0 rounded-lg overflow-hidden shadow-theme-lg"
+              <div
+                className="absolute inset-0 rounded-xl overflow-hidden shadow-warm-md"
                 style={{
                   backgroundImage: `url(${item.image})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
+                  outline: hoveredIndex === index ? "2px solid hsl(var(--secondary))" : "none",
+                  outlineOffset: hoveredIndex === index ? "2px" : "0",
                 }}
               >
                 {/* Overlay with title */}
-                <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                  <span className="text-card font-medium text-sm md:text-base transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4 md:p-6">
+                  <span className="text-card font-medium text-sm md:text-base transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 font-serif">
                     {item.title}
                   </span>
                 </div>
-                
+
                 {/* Shine effect on hover */}
-                <div 
+                <div
                   className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                   style={{
-                    background: "linear-gradient(105deg, transparent 40%, hsl(var(--primary) / 0.1) 45%, hsl(var(--primary) / 0.2) 50%, hsl(var(--primary) / 0.1) 55%, transparent 60%)",
+                    background: "linear-gradient(105deg, transparent 40%, hsl(var(--secondary) / 0.15) 45%, hsl(var(--secondary) / 0.25) 50%, hsl(var(--secondary) / 0.15) 55%, transparent 60%)",
                     transform: `translateX(${(hoverPosition - 0.5) * 100}%)`,
                   }}
                 />
@@ -141,27 +143,27 @@ export function GallerySection() {
 
         {/* Hint text */}
         <p className="text-center text-muted-foreground/60 text-sm mt-6">
-          Hover to explore • Click to view full size
+          Hover to explore &bull; Click to view full size
         </p>
       </div>
 
       {/* Lightbox */}
       {selectedImage && (
         <div
-          className="fixed inset-0 z-50 bg-foreground/95 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
+          className="fixed inset-0 z-50 bg-foreground/90 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in"
           onClick={() => setSelectedImage(null)}
         >
           <button
-            className="absolute top-4 right-4 text-card hover:text-primary transition-colors z-10"
+            className="absolute top-6 right-6 w-12 h-12 rounded-full bg-card/10 backdrop-blur-sm text-card hover:bg-secondary hover:text-white border border-card/20 flex items-center justify-center transition-all duration-300 z-10"
             onClick={() => setSelectedImage(null)}
             aria-label="Close lightbox"
           >
-            <X size={32} />
+            <X size={24} />
           </button>
           <img
             src={selectedImage}
             alt="Gallery image"
-            className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl animate-scale-in"
+            className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl animate-scale-in"
           />
         </div>
       )}

@@ -9,14 +9,17 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-theme-sm hover:shadow-theme-md",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-warm-sm hover:shadow-warm-md",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline: "border border-border bg-transparent hover:bg-muted hover:text-foreground",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-warm-sm",
         ghost: "hover:bg-muted hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        hero: "bg-primary text-primary-foreground hover:bg-primary/85 shadow-theme-md hover:shadow-theme-lg transform hover:-translate-y-0.5",
-        heroOutline: "border-2 border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground shadow-theme-sm hover:shadow-theme-md transform hover:-translate-y-0.5",
+        hero: "bg-primary text-primary-foreground hover:bg-primary/85 shadow-warm-md hover:shadow-warm-lg transform hover:-translate-y-0.5",
+        heroOutline: "border-2 border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground shadow-warm-sm hover:shadow-warm-md transform hover:-translate-y-0.5",
+        gold: "bg-gradient-to-r from-secondary to-amber-500 text-white hover:from-secondary/90 hover:to-amber-500/90 shadow-warm-md hover:shadow-warm-lg transform hover:-translate-y-0.5",
+        goldOutline: "border-2 border-secondary text-secondary bg-transparent hover:bg-secondary hover:text-white shadow-warm-sm hover:shadow-warm-md transform hover:-translate-y-0.5",
+        subtle: "bg-muted/50 text-foreground hover:bg-muted hover-lift",
       },
       size: {
         default: "h-10 px-4 py-2",

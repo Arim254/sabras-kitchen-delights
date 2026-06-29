@@ -1,8 +1,9 @@
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import logo from "/sabras-logo.png";
 
 const navLinks = [
   { href: "/#home", label: "Home" },
@@ -16,15 +17,24 @@ const navLinks = [
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleNavClick = (href: string) => {
     setIsMenuOpen(false);
     if (href.startsWith("/#")) {
       const id = href.replace("/#", "");
-      if (location.pathname === "/") {
-        const element = document.getElementById(id);
-        element?.scrollIntoView({ behavior: "smooth" });
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
       } else {
         window.location.href = href;
       }
@@ -32,12 +42,27 @@ export function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-sm border-b border-border">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        scrolled
+          ? "bg-card/90 backdrop-blur-lg border-b border-border/50 shadow-warm-sm"
+          : "bg-transparent border-transparent"
+      }`}
+    >
       <nav className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
-          <Link to="/" className="flex items-center gap-2">
-            <span className="font-serif text-xl lg:text-2xl font-bold text-primary">
-              Sabras Kitchen
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="relative">
+              <div className="w-10 h-10 rounded-full overflow-hidden ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300">
+                <img src={logo} alt="Sabra's Kitchen" className="w-full h-full object-cover" />
+              </div>
+              <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-primary/20 to-secondary/20 blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </div>
+            <span className={`font-serif text-xl lg:text-2xl font-bold transition-colors duration-300 ${
+              scrolled ? "text-primary" : "text-primary"
+            }`}>
+              Sabra's Kitchen
             </span>
           </Link>
 
@@ -48,53 +73,61 @@ export function Header() {
                 key={link.href}
                 to={link.href}
                 onClick={() => handleNavClick(link.href)}
-                className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
+                className={`text-sm font-medium transition-all duration-300 hover:text-primary relative group ${
+                  scrolled ? "text-foreground/80" : "text-primary"
+                }`}
               >
                 {link.label}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300 rounded-full" />
               </Link>
             ))}
-          </div>
-
-          <div className="hidden lg:flex items-center gap-2">
-            <ThemeToggle />
-            <Button variant="hero" size="lg" asChild>
-              <a href="/#contact">Book Now</a>
-            </Button>
+            <div className="flex items-center gap-3 pl-4 border-l border-border/30">
+              <ThemeToggle />
+              <Button variant="hero" size="sm" asChild>
+                <a href="/#contact">Book Now</a>
+              </Button>
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
           <div className="flex items-center gap-2 lg:hidden">
             <ThemeToggle />
             <button
-            className="lg:hidden p-2 text-foreground"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
-          >
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className={`p-2 rounded-lg transition-colors ${
+                scrolled ? "text-foreground hover:bg-muted" : "text-primary"
+              }`}
+              aria-label="Toggle menu"
+            >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="lg:hidden py-4 border-t border-border animate-fade-in">
-            <div className="flex flex-col gap-4">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  to={link.href}
-                  onClick={() => handleNavClick(link.href)}
-                  className="text-base font-medium text-foreground/80 hover:text-primary transition-colors py-2"
-                >
-                  {link.label}
-                </Link>
-              ))}
-              <Button variant="hero" className="mt-2" asChild>
+        {/* Mobile Menu */}
+        <div
+          className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+            isMenuOpen ? "max-h-96 opacity-100 pb-4" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="flex flex-col gap-1 bg-card/95 backdrop-blur-lg rounded-xl border border-border/50 p-3 shadow-warm-lg">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                to={link.href}
+                onClick={() => handleNavClick(link.href)}
+                className="px-4 py-3 rounded-lg text-sm font-medium text-foreground/80 hover:text-primary hover:bg-muted/50 transition-all duration-200"
+              >
+                {link.label}
+              </Link>
+            ))}
+            <div className="pt-2 mt-2 border-t border-border/50">
+              <Button variant="hero" className="w-full" asChild>
                 <a href="/#contact">Book Now</a>
               </Button>
             </div>
           </div>
-        )}
+        </div>
       </nav>
     </header>
   );

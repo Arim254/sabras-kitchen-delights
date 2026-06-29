@@ -1,0 +1,32 @@
+{
+  "title": "Kenyan Beef Pilau",
+  "slug": "kenyan-beef-pilau",
+  "featuredImage": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=1974&auto=format&fit=crop",
+  "category": "Main Course",
+  "ingredients": [
+    "2 cups basmati rice",
+    "500g beef cubes",
+    "2 tbsp pilau masala",
+    "1 cinnamon stick",
+    "4 cardamom pods",
+    "2 cloves garlic, minced",
+    "1 onion, sliced",
+    "3 cups beef broth",
+    "Salt to taste",
+    "2 tbsp cooking oil"
+  ],
+  "instructions": [
+    "Heat oil in a large pot and fry onions until golden brown.",
+    "Add garlic, cinnamon stick, cardamom pods, and pilau masala. Stir for 1 minute.",
+    "Add beef cubes and brown on all sides.",
+    "Pour in beef broth and bring to a boil. Reduce heat and simmer until beef is tender.",
+    "Add rice, stir gently, cover and cook on low heat until rice is fully cooked and liquid is absorbed.",
+    "Fluff with a fork and serve hot with kachumbari (fresh tomato and onion salad)."
+  ],
+  "prepTime": "20 mins",
+  "cookTime": "45 mins",
+  "totalTime": "1 hr 5 mins",
+  "servings": 4,
+  "notes": "For best results, use high-quality pilau masala. You can also add potatoes for a heartier meal.",
+  "publishedAt": "2024-01-15"
+}
