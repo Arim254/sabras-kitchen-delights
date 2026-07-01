@@ -11,3 +11,8 @@ socialLinks:
   instagram: ""
   twitter: ""
   youtube: ""
+recipesHeaderImages:
+  - image: /recipes/recipes-header-bg-1.jpg
+  - image: /recipes/recipes-header-bg-2.jpg
+recipesHeaderHeadline: "Our Recipes"
+recipesHeaderSubheadline: "Explore our collection of authentic Kenyan dishes, from traditional favorites to modern twists."

@@ -4,12 +4,19 @@ import { Clock, Users, Search, ChefHat, UtensilsCrossed, ArrowRight } from "luci
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Recipe } from "@/data/mockData";
+import * as yaml from "js-yaml";
 
 const RecipesPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
+  const [headerImages, setHeaderImages] = useState<string[]>([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [headerHeadline, setHeaderHeadline] = useState("Our Recipes");
+  const [headerSubheadline, setHeaderSubheadline] = useState(
+    "Explore our collection of authentic Kenyan dishes, from traditional favorites to modern twists."
+  );
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -28,9 +35,43 @@ const RecipesPage = () => {
       setCategories(categoriesModule.default);
     };
 
+    const fetchSettings = async () => {
+      try {
+        const resp = await fetch("/content/settings/site.yml");
+        const text = await resp.text();
+        const data = yaml.load(text) as any;
+        if (data?.recipesHeaderImages) {
+          const images = data.recipesHeaderImages
+            .map((item: any) => item.image)
+            .filter(Boolean);
+          if (images.length > 0) {
+            setHeaderImages(images);
+          }
+        }
+        if (data?.recipesHeaderHeadline) {
+          setHeaderHeadline(data.recipesHeaderHeadline);
+        }
+        if (data?.recipesHeaderSubheadline) {
+          setHeaderSubheadline(data.recipesHeaderSubheadline);
+        }
+      } catch {
+        // Fall back to defaults
+      }
+    };
+
     fetchRecipes();
     fetchCategories();
+    fetchSettings();
   }, []);
+
+  // Auto-rotate carousel
+  useEffect(() => {
+    if (headerImages.length < 2) return;
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % headerImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [headerImages]);
 
   const activeCategory = searchParams.get("category") || "All";
 
@@ -59,22 +100,70 @@ const RecipesPage = () => {
       <Header />
       <main className="pt-16 lg:pt-20">
         {/* Page Header */}
-        <section className="relative bg-gradient-to-b from-primary/[0.04] to-background py-16 lg:py-24 overflow-hidden">
-          <div className="organic-blob -top-20 -right-20 w-72 h-72 bg-secondary/10" />
-          <div className="organic-blob -bottom-20 -left-20 w-56 h-56 bg-primary/10" />
+        <section className="relative min-h-[55vh] flex items-center py-16 lg:py-24 overflow-hidden">
+          {/* Background Carousel - extends behind fixed header */}
+          {headerImages.length > 0 ? (
+            <div className="absolute left-0 right-0 -top-16 lg:-top-20 bottom-0">
+              {headerImages.map((src, i) => (
+                <img
+                  key={i}
+                  src={src}
+                  alt=""
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+                    i === currentImageIndex ? "opacity-100" : "opacity-0"
+                  }`}
+                />
+              ))}
+              <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
+            </div>
+          ) : (
+            <>
+              <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.04] to-background" />
+              <div className="organic-blob -top-20 -right-20 w-72 h-72 bg-secondary/10" />
+              <div className="organic-blob -bottom-20 -left-20 w-56 h-56 bg-primary/10" />
+            </>
+          )}
+          {/* Decorative blobs overlay (always shown for visual depth) */}
+          <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-1/4 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
           <div className="container mx-auto px-4 lg:px-8 relative z-10">
             <div className="text-center max-w-2xl mx-auto">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-5">
-                <UtensilsCrossed className="w-4 h-4 text-primary" />
-                <span className="text-primary font-medium text-xs uppercase tracking-[0.15em]">Recipe Collection</span>
+              <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-5 ${
+                headerImages.length > 0
+                  ? "bg-white/10 border-white/20 text-white"
+                  : "bg-primary/10 border-primary/20 text-primary"
+              }`}>
+                <UtensilsCrossed className="w-4 h-4" />
+                <span className="font-medium text-xs uppercase tracking-[0.15em]">Recipe Collection</span>
               </div>
-              <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 leading-tight">
-                Our Recipes
+              <h1 className={`font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight ${
+                headerImages.length > 0 ? "text-white" : "text-foreground"
+              }`}>
+                {headerHeadline}
               </h1>
-              <div className="w-16 h-1 bg-gradient-to-r from-primary to-secondary rounded-full mx-auto mb-5" />
-              <p className="text-muted-foreground text-lg leading-relaxed">
-                Explore our collection of authentic Kenyan dishes, from traditional favorites to modern twists.
+              <div className={`w-16 h-1 bg-gradient-to-r from-primary to-secondary rounded-full mx-auto mb-5`} />
+              <p className={`text-lg leading-relaxed ${
+                headerImages.length > 0 ? "text-white/80" : "text-muted-foreground"
+              }`}>
+                {headerSubheadline}
               </p>
+              {/* Carousel indicators */}
+              {headerImages.length > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-8">
+                  {headerImages.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentImageIndex(i)}
+                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                        i === currentImageIndex
+                          ? "bg-white w-6"
+                          : "bg-white/40 hover:bg-white/60"
+                      }`}
+                      aria-label={`Switch to image ${i + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </section>

@@ -30,9 +30,9 @@ content:
   - name: recipes
     label: Recipes
     type: collection
-    path: content/recipes
-    format: yaml-frontmatter
-    filename: "{slug}.md"
+    path: src/data/recipes
+    format: json
+    filename: "{slug}.json"
     view:
       fields: [title, category, totalTime, servings, publishedAt]
       primary: title
@@ -41,10 +41,6 @@ content:
         sort: publishedAt
         order: desc
     fields:
-      - name: id
-        label: ID
-        type: uuid
-        required: true
       - name: title
         label: Recipe Title
         type: string
@@ -112,10 +108,6 @@ content:
         label: Publish Date
         type: date
         required: true
-      - name: body
-        label: Additional Content
-        type: rich-text
-        description: Optional additional content or story about the recipe
 
   # Gallery Images Collection
   - name: gallery
@@ -252,6 +244,26 @@ content:
       - name: address
         label: Address
         type: text
+      - name: recipesHeaderImages
+        label: Recipes Page Header Images
+        type: list
+        required: false
+        description: Header background images that rotate in a carousel (add 2+ for best effect)
+        fields:
+          - name: image
+            label: Image
+            type: image
+            required: true
+      - name: recipesHeaderHeadline
+        label: Recipes Page Headline
+        type: string
+        default: "Our Recipes"
+        description: Main heading text for the recipes page
+      - name: recipesHeaderSubheadline
+        label: Recipes Page Subheadline
+        type: text
+        default: "Explore our collection of authentic Kenyan dishes, from traditional favorites to modern twists."
+        description: Subheading text for the recipes page
       - name: socialLinks
         label: Social Media Links
         type: object

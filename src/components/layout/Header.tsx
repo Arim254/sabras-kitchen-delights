@@ -53,11 +53,8 @@ export function Header() {
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="relative">
-              <div className="w-10 h-10 rounded-full overflow-hidden ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300">
-                <img src={logo} alt="Sabra's Kitchen" className="w-full h-full object-cover" />
-              </div>
-              <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-primary/20 to-secondary/20 blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="w-10 h-10 lg:w-12 lg:h-12">
+              <img src={logo} alt="Sabra's Kitchen" className="w-full h-full object-contain" />
             </div>
             <span className={`font-serif text-xl lg:text-2xl font-bold transition-colors duration-300 ${
               scrolled ? "text-primary" : "text-primary"

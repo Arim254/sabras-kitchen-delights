@@ -1,6 +1,6 @@
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import heroImage from "@/assets/hero-food.jpg";
+import heroImage from "@/assets/home-hero-bg.jpg";
 
 export function HeroSection() {
   return (
@@ -16,7 +16,7 @@ export function HeroSection() {
           className="w-full h-full object-cover scale-105"
         />
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-foreground/80 via-foreground/60 to-foreground/85" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black/85" />
       </div>
 
       {/* Decorative blobs */}
