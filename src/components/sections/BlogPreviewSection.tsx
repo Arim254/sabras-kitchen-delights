@@ -1,10 +1,25 @@
+import { useState, useEffect } from "react";
 import { Clock, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { recipes } from "@/data/mockData";
+import { Recipe } from "@/data/mockData";
 
 export function BlogPreviewSection() {
-  const featuredRecipes = recipes.slice(0, 3);
+  const [featuredRecipes, setFeaturedRecipes] = useState<Recipe[]>([]);
+
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      const recipeModules = import.meta.glob('@/data/recipes/*.json');
+      const recipesData = await Promise.all(
+        Object.entries(recipeModules).map(async ([path, loader]) => {
+          const module = await loader();
+          return { id: path, ...(module as any) };
+        })
+      );
+      setFeaturedRecipes(recipesData.slice(0, 3));
+    };
+    fetchRecipes();
+  }, []);
 
   return (
     <section id="recipes" className="section-padding bg-muted/30 relative overflow-hidden">
